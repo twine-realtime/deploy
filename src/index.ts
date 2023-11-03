@@ -25,13 +25,13 @@ program
       const regionsResult = await ec2Client.send(new DescribeRegionsCommand({}));
       const validRegions = regionsResult.Regions?.map(r => r.RegionName) ?? [];
 
-      // Check if the provided region is a valid AWS region
+      // Check if the supplied region is a current AWS region
       if (!validRegions.includes(region)) {
         console.error(`The specified region "${region}" is not a valid AWS region.`);
         process.exit(1);
       }
 
-      // Check to see if the certificate ARN includes the region specified by the user
+      // Check if the certificate ARN includes the supplied region
       if (!certificateArn.includes(region)) {
         console.error(`The certificate ARN must be from the same region as the specified region: ${region}`);
         process.exit(1);
@@ -42,7 +42,7 @@ program
         credentials: fromIni({ profile }),
       });
 
-      // ... the rest of your deployment code ...
+      // Add step to provision architecture
 
     } catch (error) {
       console.error('Error fetching AWS regions:', error);
