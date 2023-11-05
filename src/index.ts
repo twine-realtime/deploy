@@ -15,7 +15,7 @@ program
   .description('Supply AWS CLI profile and deploy Twine')
   .requiredOption('-p, --profile <name>', 'AWS CLI profile name for credentials and settings')
   .requiredOption('-r, --region <region>', 'AWS region for deployment')
-  .requiredOption('-c, --certificate-arn <arn>', 'ARN of the ACM SSL/TLS certificate for the Load Balancer')
+  .requiredOption('-c, --certificate-arn <arn>', 'ARN of the ACM TLS certificate for the Load Balancer')
   .action(async (options) => {
     const { profile, region, certificateArn } = options;
 
