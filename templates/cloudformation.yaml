@@ -73,6 +73,31 @@ Resources:
       SubnetId: !Ref MyPublicSubnetOne
       RouteTableId: !Ref MyRouteTable
 
+  MyDynamoDBTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: MyDynamoDBTable
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  DynamoDBCredentialsSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: DynamoDBCredentials
+      Description: 'Credentials for DynamoDB access'
+      GenerateSecretString:
+        SecretStringTemplate: '{"username":"my-dynamodb-user"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+      Tags:
+        - Key: Name
+          Value: DynamoDBCredentials
+
   SubnetRouteTableAssociationTwo:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -104,7 +129,6 @@ Resources:
           FromPort: '6379'
           ToPort: '6379'
           SourceSecurityGroupId: !Ref SampleEnvironmentSecurityGroup
-
 
   SampleInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
@@ -142,6 +166,13 @@ Resources:
                   'elasticache:List*'
                 ]
                 Resource: '*'
+        - PolicyName: AccessDynamoDBSecret
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ['secretsmanager:GetSecretValue']
+                Resource: !Ref DynamoDBCredentialsSecret
 
   SampleApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
@@ -166,6 +197,9 @@ Resources:
       SolutionStackName: !Ref SolutionStackName
       VersionLabel: !Ref MyAppVersion
       OptionSettings:
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: DYNAMODB_SECRET_ARN
+          Value: !Ref DynamoDBCredentialsSecret
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: LoadBalanced
