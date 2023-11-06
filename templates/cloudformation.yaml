@@ -79,7 +79,7 @@ Resources:
       SubnetId: !Ref MyPublicSubnetTwo
       RouteTableId: !Ref MyRouteTable
 
-  SampleSecurityGroup:
+  SampleEnvironmentSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security group for Elastic Beanstalk environment with load balancer'
@@ -93,6 +93,18 @@ Resources:
           FromPort: '443'
           ToPort: '443'
           CidrIp: 0.0.0.0/0
+
+  SampleRedisSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for ElastiCache Redis'
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '6379'
+          ToPort: '6379'
+          SourceSecurityGroupId: !Ref SampleEnvironmentSecurityGroup
+
 
   SampleInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
@@ -120,6 +132,16 @@ Resources:
               - Effect: Allow
                 Action: ['elasticbeanstalk:*', 'ec2:*', 'elasticloadbalancing:*', 'autoscaling:*', 'cloudwatch:*', 's3:*', 'logs:*']
                 Resource: "*"
+        - PolicyName: ElasticacheAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [
+                  'elasticache:Describe*',
+                  'elasticache:List*'
+                ]
+                Resource: '*'
 
   SampleApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
@@ -170,7 +192,7 @@ Resources:
           Value: !Join [',', [!Ref MyPublicSubnetOne, !Ref MyPublicSubnetTwo]]
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: SecurityGroups
-          Value: !Ref SampleSecurityGroup
+          Value: !Ref SampleEnvironmentSecurityGroup
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: IamInstanceProfile
           Value: !Ref SampleInstanceProfile
@@ -179,7 +201,29 @@ Resources:
         Type: Standard
       LoadBalancerType: application
 
+  MyElastiCacheSubnetGroup:
+    Type: 'AWS::ElastiCache::SubnetGroup'
+    Properties:
+      Description: 'Subnet Group for ElastiCache Redis Cluster'
+      SubnetIds:
+        - !Ref MyPublicSubnetOne
+        - !Ref MyPublicSubnetTwo
+
+  MyRedisCluster:
+    Type: 'AWS::ElastiCache::CacheCluster'
+    Properties:
+      Engine: 'redis'
+      CacheNodeType: 'cache.t3.micro'
+      NumCacheNodes: '1'
+      CacheSubnetGroupName: !Ref MyElastiCacheSubnetGroup
+      VpcSecurityGroupIds:
+        - !GetAtt SampleEnvironmentSecurityGroup.GroupId
+
 Outputs:
   EnvironmentURL:
     Description: 'URL of the AWS Elastic Beanstalk Environment'
     Value: !GetAtt SampleEnvironment.EndpointURL
+  
+  RedisEndpoint:
+    Description: 'The endpoint of the ElastiCache Redis cluster'
+    Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
