@@ -1,26 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS Elastic Beanstalk Docker Environment with VPC and Secrets Manager Access
+Description: AWS Elastic Beanstalk Docker Environment with VPC, Dynamo, and Elasticache
 
 Parameters:
-  AppName:
+  ACMCertificateARN:
     Type: String
-    Description: Name of the Elastic Beanstalk Application
-  EnvName:
+    Description: The ARN of the ACM SSL Certificate for HTTPS
+  GeneratedApiKey:
     Type: String
-    Description: Name of the Elastic Beanstalk Environment
+    Description: The API key generated in the application code
+    NoEcho: true
   SolutionStackName:
     Type: String
     Description: The name of an Elastic Beanstalk supported platform version.
     Default: '64bit Amazon Linux 2 v3.4.11 running Docker'
-  ACMCertificateARN:
+  DockerImageURL:
     Type: String
-    Description: The ARN of the ACM SSL Certificate for HTTPS
-  S3Bucket:
-    Type: String
-    Description: The name of the S3 bucket containing the Dockerrun.aws.json file
-  S3Key:
-    Type: String
-    Description: The S3 key (path) for the Dockerrun.aws.json file
+    Description: URL of the Docker image in Amazon ECR.
 
 Resources:
   MyVPC:
@@ -73,6 +68,13 @@ Resources:
       SubnetId: !Ref MyPublicSubnetOne
       RouteTableId: !Ref MyRouteTable
 
+  ApiKeySecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: 'MyAPIKeySecret'
+      Description: 'This secret stores the API key'
+      SecretString: !Ref GeneratedApiKey
+
   MyDynamoDBTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
@@ -84,19 +86,6 @@ Resources:
         - AttributeName: Id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
-
-  DynamoDBCredentialsSecret:
-    Type: 'AWS::SecretsManager::Secret'
-    Properties:
-      Name: DynamoDBCredentials
-      Description: 'Credentials for DynamoDB access'
-      GenerateSecretString:
-        SecretStringTemplate: '{"username":"my-dynamodb-user"}'
-        GenerateStringKey: "password"
-        PasswordLength: 16
-      Tags:
-        - Key: Name
-          Value: DynamoDBCredentials
 
   SubnetRouteTableAssociationTwo:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
@@ -154,30 +143,27 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: ['elasticbeanstalk:*', 'ec2:*', 'elasticloadbalancing:*', 'autoscaling:*', 'cloudwatch:*', 's3:*', 'logs:*']
+                Action: ['elasticbeanstalk:*', 'ec2:*', 'elasticloadbalancing:*', 'autoscaling:*', 'cloudwatch:*', 'logs:*']
                 Resource: "*"
         - PolicyName: ElasticacheAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: [
-                  'elasticache:Describe*',
-                  'elasticache:List*'
-                ]
+                Action: 'elasticache:*'
                 Resource: '*'
-        - PolicyName: AccessDynamoDBSecret
+        - PolicyName: DynamoDBAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: ['secretsmanager:GetSecretValue']
-                Resource: !Ref DynamoDBCredentialsSecret
+                Action: 'dynamodb:*'
+                Resource: !GetAtt MyDynamoDBTable.Arn
 
   SampleApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
     Properties:
-      ApplicationName: !Ref AppName
+      ApplicationName: 'Twine'
       Description: 'Elastic Beanstalk Application running on Docker'
 
   MyAppVersion:
@@ -185,21 +171,15 @@ Resources:
     Properties:
       ApplicationName: !Ref SampleApplication
       Description: 'Version associated with the Dockerrun.aws.json'
-      SourceBundle:
-        S3Bucket: !Ref S3Bucket
-        S3Key: !Ref S3Key
 
   SampleEnvironment:
     Type: 'AWS::ElasticBeanstalk::Environment'
     Properties:
       ApplicationName: !Ref SampleApplication
-      EnvironmentName: !Ref EnvName
+      EnvironmentName: 'Twine'
       SolutionStackName: !Ref SolutionStackName
       VersionLabel: !Ref MyAppVersion
       OptionSettings:
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: DYNAMODB_SECRET_ARN
-          Value: !Ref DynamoDBCredentialsSecret
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: LoadBalanced
@@ -230,6 +210,15 @@ Resources:
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: IamInstanceProfile
           Value: !Ref SampleInstanceProfile
+        - Namespace: 'aws:elasticbeanstalk:container:docker'
+          OptionName: ImageUrl
+          Value: !Ref DockerImageURL
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: REDIS_HOST
+          Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: REDIS_PORT
+          Value: '6379'
       Tier:
         Name: WebServer
         Type: Standard
@@ -257,7 +246,7 @@ Outputs:
   EnvironmentURL:
     Description: 'URL of the AWS Elastic Beanstalk Environment'
     Value: !GetAtt SampleEnvironment.EndpointURL
-  
+
   RedisEndpoint:
     Description: 'The endpoint of the ElastiCache Redis cluster'
     Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
