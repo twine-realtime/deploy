@@ -159,6 +159,13 @@ Resources:
               - Effect: Allow
                 Action: 'dynamodb:*'
                 Resource: !GetAtt MyDynamoDBTable.Arn
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'secretsmanager:GetSecretValue'
+                Resource: '*'
 
   SampleApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
@@ -210,12 +217,15 @@ Resources:
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: IamInstanceProfile
           Value: !Ref SampleInstanceProfile
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: InstanceType
+          Value: 't2.small'
         - Namespace: 'aws:elasticbeanstalk:container:docker'
           OptionName: ImageUrl
           Value: !Ref DockerImageURL
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
+        - Namespace: 'aws:elasticbeanstalk:application:environment' 
           OptionName: REDIS_HOST
-          Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
+          Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: REDIS_PORT
           Value: '6379'
@@ -233,13 +243,17 @@ Resources:
         - !Ref MyPublicSubnetTwo
 
   MyRedisCluster:
-    Type: 'AWS::ElastiCache::CacheCluster'
+    Type: 'AWS::ElastiCache::ReplicationGroup'
     Properties:
+      ReplicationGroupDescription: 'My cluster mode enabled Redis replication group'
       Engine: 'redis'
-      CacheNodeType: 'cache.t3.micro'
-      NumCacheNodes: '1'
+      CacheNodeType: 'cache.t2.micro'
+      NumNodeGroups: 2
+      ReplicasPerNodeGroup: 1
+      AutomaticFailoverEnabled: true
+      MultiAZEnabled: true
       CacheSubnetGroupName: !Ref MyElastiCacheSubnetGroup
-      VpcSecurityGroupIds:
+      SecurityGroupIds:
         - !GetAtt SampleEnvironmentSecurityGroup.GroupId
 
 Outputs:
@@ -249,4 +263,4 @@ Outputs:
 
   RedisEndpoint:
     Description: 'The endpoint of the ElastiCache Redis cluster'
-    Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
+    Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
