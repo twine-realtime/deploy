@@ -13,9 +13,6 @@ Parameters:
     Type: String
     Description: The name of an Elastic Beanstalk supported platform version.
     Default: '64bit Amazon Linux 2 v3.4.11 running Docker'
-  DockerImageURL:
-    Type: String
-    Description: URL of the Docker image in Amazon ECR.
 
 Resources:
   MyVPC:
@@ -222,9 +219,9 @@ Resources:
           Value: 't2.small'
         - Namespace: 'aws:elasticbeanstalk:container:docker'
           OptionName: ImageUrl
-          Value: !Ref DockerImageURL
+          Value: public.ecr.aws/n8x4g7b4/twine-server:latest
         - Namespace: 'aws:elasticbeanstalk:application:environment' 
-          OptionName: REDIS_HOST
+          OptionName: CACHE_ENDPOINT
           Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: REDIS_PORT

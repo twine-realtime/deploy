@@ -1,5 +1,7 @@
 import { Command } from 'commander';
-import { CloudFormationClient } from "@aws-sdk/client-cloudformation";
+import { v4 as uuid4 } from 'uuid';
+import { readFileSync } from 'fs';
+import { CloudFormationClient, CreateStackCommand, Capability } from "@aws-sdk/client-cloudformation";
 import { EC2Client, DescribeRegionsCommand } from "@aws-sdk/client-ec2";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
 
@@ -42,7 +44,53 @@ program
         credentials: fromIni({ profile }),
       });
 
-      // Add step to provision architecture
+      let templateContent;
+      try {
+        const templateBody = '../templates/cloudformation.yaml';
+        templateContent = readFileSync(templateBody, 'utf8');
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(`Failed to read CloudFormation template: ${err.message}`);
+        } else {
+          console.error('An unknown error occurred while reading the CloudFormation template');
+        }
+        process.exit(1);
+      }
+
+      const cfParams = {
+        Parameters: [
+          {
+            ParameterKey: 'ACMCertificateARN',
+            ParameterValue: certificateArn,
+          },
+          {
+            ParameterKey: 'GeneratedApiKey',
+            ParameterValue: uuid4(),
+          },
+        ],
+        TemplateBody: templateContent,
+        Capabilities: [
+          Capability.CAPABILITY_IAM,
+          Capability.CAPABILITY_NAMED_IAM
+        ],
+        Tags: [
+          {
+            Key: 'Name',
+            Value: 'TwineStack'
+          }
+        ],
+        StackName: 'TwineStack'
+      };
+
+      try {
+        console.log(`Deploying Twine stack to region ${region}...`);
+        const createStackCommand = new CreateStackCommand(cfParams);
+        const stackResult = await cloudFormationClient.send(createStackCommand);
+        console.log(`Stack creation initiated, StackId: ${stackResult.StackId}`);
+      } catch (cfError) {
+        console.error('Error creating AWS CloudFormation stack:', cfError);
+        process.exit(1);
+      }
 
     } catch (error) {
       console.error('Error fetching AWS regions:', error);

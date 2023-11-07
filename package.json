@@ -7,11 +7,13 @@
     "@aws-sdk/client-cloudformation": "^3.441.0",
     "@aws-sdk/client-ec2": "^3.441.0",
     "@aws-sdk/credential-provider-ini": "^3.441.0",
-    "commander": "^11.1.0"
+    "commander": "^11.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/node": "^20.8.10",
+    "@types/uuid": "^9.0.6",
     "typescript": "^5.2.2"
   }
 }
