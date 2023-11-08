@@ -12,7 +12,10 @@ Parameters:
   SolutionStackName:
     Type: String
     Description: The name of an Elastic Beanstalk supported platform version.
-    Default: '64bit Amazon Linux 2 v3.4.11 running Docker'
+    Default: '64bit Amazon Linux 2023 v4.1.0 running Docker'
+  EnvironmentRegion:
+    Type: String
+    Description: The AWS Region where the application will be deployed.
 
 Resources:
   MyVPC:
@@ -68,7 +71,7 @@ Resources:
   ApiKeySecret:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
-      Name: 'MyAPIKeySecret'
+      Name: 'TwineAPI'
       Description: 'This secret stores the API key'
       SecretString: !Ref GeneratedApiKey
 
@@ -103,6 +106,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: '443'
           ToPort: '443'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '3005'
+          ToPort: '3005'
           CidrIp: 0.0.0.0/0
 
   SampleRedisSecurityGroup:
@@ -163,6 +170,21 @@ Resources:
               - Effect: Allow
                 Action: 'secretsmanager:GetSecretValue'
                 Resource: '*'
+        - PolicyName: CertificateManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'acm:ListCertificates'
+                  - 'acm:DescribeCertificate'
+                  - 'acm:GetCertificate'
+                  - 'acm:ImportCertificate'  # Added to allow importing of certificates
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'  # Added to allow passing of roles
+                Resource: '*'  # This should be restricted to the specific roles that need to be passed
 
   SampleApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
@@ -174,10 +196,14 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ApplicationVersion'
     Properties:
       ApplicationName: !Ref SampleApplication
-      Description: 'Version associated with the Dockerrun.aws.json'
+      Description: 'Initial version'
+      SourceBundle:
+        S3Bucket: "twine-docker-southeast2"
+        S3Key: "Dockerrun.aws.json"
 
   SampleEnvironment:
     Type: 'AWS::ElasticBeanstalk::Environment'
+    DependsOn: MyRedisCluster
     Properties:
       ApplicationName: !Ref SampleApplication
       EnvironmentName: 'Twine'
@@ -187,21 +213,12 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: LoadBalanced
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: LoadBalancerType
+          Value: 'classic'
         - Namespace: 'aws:elasticbeanstalk:application'
           OptionName: Application Healthcheck URL
-          Value: HTTP:80/
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: ListenerEnabled
-          Value: 'true'
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: SSLCertificateArns
-          Value: !Ref ACMCertificateARN
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: DefaultProcess
-          Value: default
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: Protocol
-          Value: HTTPS
+          Value: 'HTTP:3005/'
         - Namespace: 'aws:ec2:vpc'
           OptionName: VPCId
           Value: !Ref MyVPC
@@ -211,25 +228,30 @@ Resources:
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: SecurityGroups
           Value: !Ref SampleEnvironmentSecurityGroup
+        - Namespace: 'aws:elb:loadbalancer'
+          OptionName: 'SecurityGroups'
+          Value: !Ref SampleEnvironmentSecurityGroup
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: IamInstanceProfile
           Value: !Ref SampleInstanceProfile
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: InstanceType
           Value: 't2.small'
-        - Namespace: 'aws:elasticbeanstalk:container:docker'
-          OptionName: ImageUrl
-          Value: public.ecr.aws/n8x4g7b4/twine-server:latest
-        - Namespace: 'aws:elasticbeanstalk:application:environment' 
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: CACHE_ENDPOINT
           Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: REDIS_PORT
           Value: '6379'
+        - Namespace: 'aws:elb:loadbalancer'
+          OptionName: SSLCertificateId
+          Value: !Ref ACMCertificateARN
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'REGION'
+          Value: !Ref EnvironmentRegion
       Tier:
         Name: WebServer
         Type: Standard
-      LoadBalancerType: application
 
   MyElastiCacheSubnetGroup:
     Type: 'AWS::ElastiCache::SubnetGroup'
@@ -244,8 +266,8 @@ Resources:
     Properties:
       ReplicationGroupDescription: 'My cluster mode enabled Redis replication group'
       Engine: 'redis'
-      CacheNodeType: 'cache.t2.micro'
-      NumNodeGroups: 2
+      CacheNodeType: 'cache.t4g.micro'
+      NumNodeGroups: 1
       ReplicasPerNodeGroup: 1
       AutomaticFailoverEnabled: true
       MultiAZEnabled: true

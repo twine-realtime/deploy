@@ -46,7 +46,7 @@ program
 
       let templateContent;
       try {
-        const templateBody = '../templates/cloudformation.yaml';
+        const templateBody = './templates/cloudformation.yaml';
         templateContent = readFileSync(templateBody, 'utf8');
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -67,17 +67,15 @@ program
             ParameterKey: 'GeneratedApiKey',
             ParameterValue: uuid4(),
           },
+          {
+            ParameterKey: 'EnvironmentRegion',
+            ParameterValue: region,
+          },
         ],
         TemplateBody: templateContent,
         Capabilities: [
           Capability.CAPABILITY_IAM,
           Capability.CAPABILITY_NAMED_IAM
-        ],
-        Tags: [
-          {
-            Key: 'Name',
-            Value: 'TwineStack'
-          }
         ],
         StackName: 'TwineStack'
       };
