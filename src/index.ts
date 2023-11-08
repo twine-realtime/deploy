@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { CloudFormationClient, CreateStackCommand, Capability } from "@aws-sdk/client-cloudformation";
 import { EC2Client, DescribeRegionsCommand } from "@aws-sdk/client-ec2";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
+const inquirer = require('inquirer');
 
 const program = new Command();
 
@@ -12,14 +13,34 @@ program
   .description('Deploy Twine with AWS CloudFormation')
   .version('0.1.0');
 
-program
+  program
   .command('deploy')
-  .description('Supply AWS CLI profile and deploy Twine')
-  .requiredOption('-p, --profile <name>', 'AWS CLI profile name for credentials and settings')
-  .requiredOption('-r, --region <region>', 'AWS region for deployment')
-  .requiredOption('-c, --certificate-arn <arn>', 'ARN of the ACM TLS certificate for the Load Balancer')
-  .action(async (options) => {
-    const { profile, region, certificateArn } = options;
+  .description('Interactively deploy Twine')
+  .action(async () => {
+    const questions = [
+      {
+        type: 'input',
+        name: 'profile',
+        message: 'AWS CLI profile name for credentials and settings:',
+        validate: (input: string) => input.length > 0 ? true : "Profile name cannot be empty."
+      },
+      {
+        type: 'input',
+        name: 'region',
+        message: 'AWS region for deployment:',
+        validate: (input: string) => input.length > 0 ? true : "Region cannot be empty."
+      },
+      {
+        type: 'input',
+        name: 'certificateArn',
+        message: 'ARN of the ACM TLS certificate for the Load Balancer:',
+        validate: (input: string) => input.length > 0 ? true : "Certificate ARN cannot be empty."
+      }
+      // add one for domain name, then use below
+    ];
+
+    const answers = await inquirer.prompt(questions);
+    const { profile, region, certificateArn } = answers;
 
     const ec2Client = new EC2Client({ region: "us-east-1" }); // Default to a common region to fetch list of regions
 
