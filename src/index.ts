@@ -126,7 +126,20 @@ const promptReadyToProceed = async () => {
 \x1b[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md
 
 \x1b[0mAre you ready to proceed?`,
-    default: false // Set the default answer to 'no'
+    default: false // Default answer
+  };
+
+  const answer = await inquirer.prompt(question);
+  return answer.readyToProceed;
+};
+
+const promptReadyToDeploy = async () => {
+  const question = {
+    type: 'confirm',
+    name: 'readyToDeploy',
+    prefix: 'Twine ~',
+    message: 'Deploy Twine in your AWS account?',
+    default: false // Default answer
   };
 
   const answer = await inquirer.prompt(question);
@@ -146,6 +159,12 @@ const promptReadyToProceed = async () => {
     const profile = await promptProfile();
     const region = await promptRegion();
     const certificateArn = await promptCertificateArn(region);
+    const confirmDeployment = await promptReadyToDeploy();
+
+    if (!confirmDeployment) {
+      console.log('Twine deployment cancelled.');
+      return; // Exit the process if the user is not ready
+    }
 
     // New client from validated profile and region
     const cloudFormationClient = new CloudFormationClient({

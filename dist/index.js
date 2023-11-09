@@ -191,7 +191,26 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                     name: 'readyToProceed',
                     prefix: '',
                     message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The AWS region for deployment\n\u001B[0m3) The ARN of an ACM TLS certificate hosted within the deployment region\n\n\u001B[0mIf you have not already done so, read the documentation and \n\u001B[0mcomplete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
-                    default: false // Set the default answer to 'no'
+                    default: false // Default answer
+                };
+                return [4 /*yield*/, inquirer.prompt(question)];
+            case 1:
+                answer = _a.sent();
+                return [2 /*return*/, answer.readyToProceed];
+        }
+    });
+}); };
+var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var question, answer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                question = {
+                    type: 'confirm',
+                    name: 'readyToDeploy',
+                    prefix: 'Twine ~ ',
+                    message: 'Are you ready to create Twine in your AWS account?',
+                    default: false // Default answer
                 };
                 return [4 /*yield*/, inquirer.prompt(question)];
             case 1:
@@ -201,7 +220,7 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
     });
 }); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var isReady, profile, region, certificateArn, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_3;
+    var isReady, profile, region, certificateArn, confirmDeployment, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, promptReadyToProceed()];
@@ -213,7 +232,7 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                 }
                 _a.label = 2;
             case 2:
-                _a.trys.push([2, 10, , 11]);
+                _a.trys.push([2, 11, , 12]);
                 return [4 /*yield*/, promptProfile()];
             case 3:
                 profile = _a.sent();
@@ -223,6 +242,13 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                 return [4 /*yield*/, promptCertificateArn(region)];
             case 5:
                 certificateArn = _a.sent();
+                return [4 /*yield*/, promptReadyToDeploy()];
+            case 6:
+                confirmDeployment = _a.sent();
+                if (!confirmDeployment) {
+                    console.log('Twine deployment cancelled.');
+                    return [2 /*return*/]; // Exit the process if the user is not ready
+                }
                 cloudFormationClient = new client_cloudformation_1.CloudFormationClient({
                     region: region,
                     credentials: (0, credential_provider_ini_1.fromIni)({ profile: profile }),
@@ -262,26 +288,26 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                     ],
                     StackName: 'TwineStack'
                 };
-                _a.label = 6;
-            case 6:
-                _a.trys.push([6, 8, , 9]);
+                _a.label = 7;
+            case 7:
+                _a.trys.push([7, 9, , 10]);
                 console.log("Deploying Twine stack to region ".concat(region, "..."));
                 createStackCommand = new client_cloudformation_1.CreateStackCommand(cfParams);
                 return [4 /*yield*/, cloudFormationClient.send(createStackCommand)];
-            case 7:
+            case 8:
                 stackResult = _a.sent();
                 console.log("Stack creation initiated, StackId: ".concat(stackResult.StackId));
-                return [3 /*break*/, 9];
-            case 8:
+                return [3 /*break*/, 10];
+            case 9:
                 cfError_1 = _a.sent();
                 console.error('Error creating AWS CloudFormation stack:', cfError_1);
-                return [3 /*break*/, 9];
-            case 9: return [3 /*break*/, 11];
-            case 10:
+                return [3 /*break*/, 10];
+            case 10: return [3 /*break*/, 12];
+            case 11:
                 error_3 = _a.sent();
                 console.error('An error occurred:', error_3);
-                return [3 /*break*/, 11];
-            case 11: return [2 /*return*/];
+                return [3 /*break*/, 12];
+            case 12: return [2 /*return*/];
         }
     });
 }); })();

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "tsc && node twine-deploy/index.js deploy",
+    "start": "tsc && node dist/index.js deploy",
     "type": "module"
   },
   "dependencies": {
