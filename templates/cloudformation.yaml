@@ -11,11 +11,14 @@ Parameters:
     NoEcho: true
   SolutionStackName:
     Type: String
-    Description: The name of an Elastic Beanstalk supported platform version.
+    Description: The name of an Elastic Beanstalk supported platform version
     Default: '64bit Amazon Linux 2023 v4.1.0 running Docker'
   EnvironmentRegion:
     Type: String
-    Description: The AWS Region where the application will be deployed.
+    Description: The AWS Region where the application will be deployed
+  S3BucketParam:
+    Type: String
+    Description: The name of the S3 bucket where the source bundle is located
 
 Resources:
   MyVPC:
@@ -166,28 +169,16 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: ['elasticbeanstalk:*', 'ec2:*', 'elasticloadbalancing:*', 'autoscaling:*', 'cloudwatch:*', 'logs:*']
-                Resource: "*"
-        - PolicyName: ElasticacheAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: 'elasticache:*'
-                Resource: '*'
-        - PolicyName: DynamoDBAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: 'dynamodb:*'
-                Resource: '*'
-        - PolicyName: SecretsManagerAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: 'secretsmanager:GetSecretValue'
+                Action: 
+                  - 'elasticbeanstalk:*'
+                  - 'ec2:*'
+                  - 'elasticloadbalancing:*'
+                  - 'autoscaling:*'
+                  - 'cloudwatch:*'
+                  - 'logs:*'
+                  - 'elasticache:*'
+                  - 'dynamodb:*'
+                  - 'secretsmanager:GetSecretValue'
                 Resource: '*'
         - PolicyName: CertificateManagerAccess
           PolicyDocument:
@@ -217,7 +208,7 @@ Resources:
       ApplicationName: !Ref SampleApplication
       Description: 'Initial version'
       SourceBundle:
-        S3Bucket: "twine-docker-southeast2"
+        S3Bucket: !Ref S3BucketParam
         S3Key: "Dockerrun.aws.json"
 
   SampleEnvironment:

@@ -200,6 +200,10 @@ const promptReadyToDeploy = async () => {
           ParameterKey: 'EnvironmentRegion',
           ParameterValue: region,
         },
+        {
+          ParameterKey: 'S3BucketParam',
+          ParameterValue: `twine-${region}`,
+        },
       ],
       TemplateBody: templateContent,
       Capabilities: [
@@ -223,3 +227,4 @@ const promptReadyToDeploy = async () => {
     console.error('An error occurred:', error);
   }
 })();
+
