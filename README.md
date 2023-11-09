@@ -4,8 +4,8 @@ Twine uses Cloud Formation to deploy on AWS. The Twine architecture is extensive
 
 A TLS certificate is required to secure your Twine server's WebSocket connection to clients:
 
-- In the AWS Console, navigate to the AWS Region where you plan to deploy Twine
-- Create a Route 53 domain in your new AWS account (you will later use that domain name with the Twine client library)
+- In your new account's AWS Console, navigate to the AWS Region where you plan to deploy Twine
+- Create a Route 53 domain (you will later use that domain name with the Twine client library)
 - Navigate to Certificate Manager and request a TLS certificate with an RSA 2048 key for the new domain
 
 Once those steps are complete, clone this repo > npm install > npm start and follow the instructions in your terminal.
