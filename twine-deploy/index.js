@@ -143,6 +143,7 @@ var promptRegion = function () { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 var validateCertificateArn = function (input, region) {
+    // Check structure of input certificate ARN
     var arnRegex = /^arn:aws:acm:[a-z0-9-]+:\d{12}:certificate\/[a-zA-Z0-9-]+$/;
     if (input.length === 0) {
         return "Certificate ARN cannot be empty.";
@@ -180,20 +181,47 @@ var promptCertificateArn = function (region) { return __awaiter(void 0, void 0, 
         }
     });
 }); };
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var profile, region, certificateArn, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_3;
+var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var question, answer;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 8, , 9]);
-                return [4 /*yield*/, promptProfile()];
+                question = {
+                    type: 'confirm',
+                    name: 'readyToProceed',
+                    prefix: '',
+                    message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The AWS region for deployment\n\u001B[0m3) The ARN of an ACM TLS certificate hosted within the deployment region\n\n\u001B[0mIf you have not already done so, read the documentation and \n\u001B[0mcomplete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
+                    default: false // Set the default answer to 'no'
+                };
+                return [4 /*yield*/, inquirer.prompt(question)];
             case 1:
+                answer = _a.sent();
+                return [2 /*return*/, answer.readyToProceed];
+        }
+    });
+}); };
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var isReady, profile, region, certificateArn, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, promptReadyToProceed()];
+            case 1:
+                isReady = _a.sent();
+                if (!isReady) {
+                    console.log('Twine deployment cancelled.');
+                    return [2 /*return*/]; // Exit the process if the user is not ready
+                }
+                _a.label = 2;
+            case 2:
+                _a.trys.push([2, 10, , 11]);
+                return [4 /*yield*/, promptProfile()];
+            case 3:
                 profile = _a.sent();
                 return [4 /*yield*/, promptRegion()];
-            case 2:
+            case 4:
                 region = _a.sent();
                 return [4 /*yield*/, promptCertificateArn(region)];
-            case 3:
+            case 5:
                 certificateArn = _a.sent();
                 cloudFormationClient = new client_cloudformation_1.CloudFormationClient({
                     region: region,
@@ -234,26 +262,26 @@ var promptCertificateArn = function (region) { return __awaiter(void 0, void 0, 
                     ],
                     StackName: 'TwineStack'
                 };
-                _a.label = 4;
-            case 4:
-                _a.trys.push([4, 6, , 7]);
+                _a.label = 6;
+            case 6:
+                _a.trys.push([6, 8, , 9]);
                 console.log("Deploying Twine stack to region ".concat(region, "..."));
                 createStackCommand = new client_cloudformation_1.CreateStackCommand(cfParams);
                 return [4 /*yield*/, cloudFormationClient.send(createStackCommand)];
-            case 5:
+            case 7:
                 stackResult = _a.sent();
                 console.log("Stack creation initiated, StackId: ".concat(stackResult.StackId));
-                return [3 /*break*/, 7];
-            case 6:
+                return [3 /*break*/, 9];
+            case 8:
                 cfError_1 = _a.sent();
                 console.error('Error creating AWS CloudFormation stack:', cfError_1);
-                return [3 /*break*/, 7];
-            case 7: return [3 /*break*/, 9];
-            case 8:
+                return [3 /*break*/, 9];
+            case 9: return [3 /*break*/, 11];
+            case 10:
                 error_3 = _a.sent();
                 console.error('An error occurred:', error_3);
-                return [3 /*break*/, 9];
-            case 9: return [2 /*return*/];
+                return [3 /*break*/, 11];
+            case 11: return [2 /*return*/];
         }
     });
 }); })();

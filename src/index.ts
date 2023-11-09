@@ -106,7 +106,41 @@ const promptCertificateArn = async (region: string) => {
   return certificateArn;
 };
 
+const promptReadyToProceed = async () => {
+  const question = {
+    type: 'confirm',
+    name: 'readyToProceed',
+    prefix: '',
+    message: `\x1b[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+\x1b[0mThis process deploys the Twine architecture on your AWS account.
+
+\x1b[0mYou will be asked to provide:
+
+\x1b[0m1) An AWS CLI profile name for credentials
+\x1b[0m2) The AWS region for deployment
+\x1b[0m3) The ARN of an ACM TLS certificate hosted within the deployment region
+
+\x1b[0mIf you have not already done so, read the documentation and 
+\x1b[0mcomplete the prerequisite steps in this README:
+\x1b[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md
+
+\x1b[0mAre you ready to proceed?`,
+    default: false // Set the default answer to 'no'
+  };
+
+  const answer = await inquirer.prompt(question);
+  return answer.readyToProceed;
+};
+
 (async () => {
+  const isReady = await promptReadyToProceed();
+
+  if (!isReady) {
+    console.log('Twine deployment cancelled.');
+    return; // Exit the process if the user is not ready
+  }
+
   try {
     // Validate one at a time
     const profile = await promptProfile();
