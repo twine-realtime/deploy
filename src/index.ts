@@ -70,6 +70,7 @@ const promptRegion = async () => {
 };
 
 const validateCertificateArn = (input: string, region: string) => {
+  // Check structure of input certificate ARN
   const arnRegex = /^arn:aws:acm:[a-z0-9-]+:\d{12}:certificate\/[a-zA-Z0-9-]+$/;
 
   if (input.length === 0) {
@@ -107,15 +108,18 @@ const promptCertificateArn = async (region: string) => {
 
 (async () => {
   try {
+    // Validate one at a time
     const profile = await promptProfile();
     const region = await promptRegion();
     const certificateArn = await promptCertificateArn(region);
 
+    // New client from validated profile and region
     const cloudFormationClient = new CloudFormationClient({
       region: region,
       credentials: fromIni({ profile }),
     });
 
+    // Parse Cloud Formation template
     let templateContent;
     try {
       const templateBody = './templates/cloudformation.yaml';
@@ -128,6 +132,7 @@ const promptCertificateArn = async (region: string) => {
       }
     }
 
+    // Set values for the parameters established in the template
     const cfParams = {
       Parameters: [
         {
@@ -151,6 +156,7 @@ const promptCertificateArn = async (region: string) => {
       StackName: 'TwineStack'
     };
 
+    // Combine the user input and template to create a stack
     try {
       console.log(`Deploying Twine stack to region ${region}...`);
       const createStackCommand = new CreateStackCommand(cfParams);
