@@ -6,9 +6,9 @@ A TLS certificate is required to secure your Twine server's WebSocket connection
 
 Once those steps are complete, clone this repo > npm install > npm start and follow the instructions in your terminal.
 
-The creation process can be observed in AWS Management Console > Cloud Formation > Stacks. After the process is complete, the Twine server will be running in the Elastic Beanstalk Environment. However, you must satisfy browser requirements by pointing your domain to the new Twine load balancer:
+The creation process can be observed in AWS Management Console > Cloud Formation > Stacks. After the process is complete, the Twine server will be running in the Elastic Beanstalk Environment. However, to satisfy browser requirements, Twine must use the newly-created domain name instead of the load balancer endpoint. A DNS record for the load balancer is necessary:
 
-- Navigate to Route 53 > Hosted Zones and click on the listed domain name
+- Navigate to AWS Management Console > Route 53 > Hosted Zones and click on the listed domain name
 - Click Create Record
 - Ensure the Record Type is A then click Alias
 - Set the Endpoint to 'Alias to Application and Classic Load Balancer'
