@@ -190,7 +190,7 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                     type: 'confirm',
                     name: 'readyToProceed',
                     prefix: '',
-                    message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The AWS region for deployment\n\u001B[0m3) The ARN of an ACM TLS certificate hosted within the deployment region\n\n\u001B[0mIf you have not already done so, read the documentation and \n\u001B[0mcomplete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
+                    message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The AWS region for deployment\n\u001B[0m3) The ARN of an ACM TLS certificate hosted within the deployment region\n\n\u001B[0mIf you have not already done so, read the documentation \n\u001B[0mand complete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
                     default: false // Default answer
                 };
                 return [4 /*yield*/, inquirer.prompt(question)];
@@ -208,8 +208,8 @@ var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0,
                 question = {
                     type: 'confirm',
                     name: 'readyToDeploy',
-                    prefix: 'Twine ~ ',
-                    message: 'Are you ready to create Twine in your AWS account?',
+                    prefix: 'Twine ~',
+                    message: 'Deploy Twine in your AWS account?',
                     default: false // Default answer
                 };
                 return [4 /*yield*/, inquirer.prompt(question)];
@@ -227,7 +227,7 @@ var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0,
             case 1:
                 isReady = _a.sent();
                 if (!isReady) {
-                    console.log('Twine deployment cancelled.');
+                    console.log('\nTwine deployment cancelled.');
                     return [2 /*return*/]; // Exit the process if the user is not ready
                 }
                 _a.label = 2;
@@ -246,7 +246,7 @@ var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0,
             case 6:
                 confirmDeployment = _a.sent();
                 if (!confirmDeployment) {
-                    console.log('Twine deployment cancelled.');
+                    console.log('\nTwine deployment cancelled.');
                     return [2 /*return*/]; // Exit the process if the user is not ready
                 }
                 cloudFormationClient = new client_cloudformation_1.CloudFormationClient({
@@ -279,6 +279,10 @@ var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0,
                         {
                             ParameterKey: 'EnvironmentRegion',
                             ParameterValue: region,
+                        },
+                        {
+                            ParameterKey: 'S3BucketParam',
+                            ParameterValue: "twine-".concat(region),
                         },
                     ],
                     TemplateBody: templateContent,

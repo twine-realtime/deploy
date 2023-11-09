@@ -16,4 +16,4 @@ The creation process can be observed in AWS Management Console > Cloud Formation
 - Select the single option for Choose Load Balancer
 - Click Create Records
 
-Record creation may take a few minutes. The Twine architecture will then be complete and ready for Twine server/client library implementation.
+Record creation may take a few minutes. The Twine architecture will then be complete and ready for Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.

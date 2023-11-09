@@ -121,8 +121,8 @@ const promptReadyToProceed = async () => {
 \x1b[0m2) The AWS region for deployment
 \x1b[0m3) The ARN of an ACM TLS certificate hosted within the deployment region
 
-\x1b[0mIf you have not already done so, read the documentation and 
-\x1b[0mcomplete the prerequisite steps in this README:
+\x1b[0mIf you have not already done so, read the documentation 
+\x1b[0mand complete the prerequisite steps in this README:
 \x1b[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md
 
 \x1b[0mAre you ready to proceed?`,
@@ -150,7 +150,7 @@ const promptReadyToDeploy = async () => {
   const isReady = await promptReadyToProceed();
 
   if (!isReady) {
-    console.log('Twine deployment cancelled.');
+    console.log('\nTwine deployment cancelled.');
     return; // Exit the process if the user is not ready
   }
 
@@ -162,7 +162,7 @@ const promptReadyToDeploy = async () => {
     const confirmDeployment = await promptReadyToDeploy();
 
     if (!confirmDeployment) {
-      console.log('Twine deployment cancelled.');
+      console.log('\nTwine deployment cancelled.');
       return; // Exit the process if the user is not ready
     }
 
