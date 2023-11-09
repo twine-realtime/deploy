@@ -2,13 +2,17 @@
 
 Twine uses Cloud Formation to deploy on AWS. The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and creating an AWS CLI profile for either that account's root credentials or for an IAM role on that account with the AdministratorAccess permission policy. That profile name is to be provided when answering the deployment questions.
 
-A TLS certificate is required to secure your Twine server's WebSocket connection to your clients: In your new AWS account, create a Route 53 domain. (You will later use that domain name with the Twine client library.) Next, use Certificate Manager to request a TLS certificate with an RSA 2048 key for that domain: The AWS region in which you do this determines the region of your Twine deployment.
+A TLS certificate is required to secure your Twine server's WebSocket connection to your clients:
+
+- In the AWS Console, navigate to the AWS Region where you plan to deploy Twine
+- Create a Route 53 domain in your new AWS account (you will later use that domain name with the Twine client library)
+- Navigate to Certificate Manager and request a TLS certificate with an RSA 2048 key for the new domain
 
 Once those steps are complete, clone this repo > npm install > npm start and follow the instructions in your terminal.
 
-The creation process can be observed in AWS Management Console > Cloud Formation > Stacks. After the process is complete, the Twine server will be running in the Elastic Beanstalk Environment. However, to satisfy browser requirements, Twine must use the newly-created domain name instead of the load balancer endpoint. A DNS record for the load balancer is necessary:
+The creation process can be observed in Cloud Formation > Stacks. After the process is complete, the Twine server will be running in the Elastic Beanstalk Environment. However, to satisfy browser requirements, Twine must use the newly-created domain name instead of the load balancer endpoint. A DNS record for the load balancer is necessary:
 
-- Navigate to AWS Management Console > Route 53 > Hosted Zones and click on the listed domain name
+- Navigate to Route 53 > Hosted Zones and click on the listed domain name
 - Click Create Record
 - Ensure the Record Type is A then click Alias
 - Set the Endpoint to 'Alias to Application and Classic Load Balancer'
