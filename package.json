@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "build": "tsc",
+    "start": "tsc && node twine-deploy/index.js deploy",
     "type": "module"
   },
   "dependencies": {
@@ -10,12 +9,10 @@
     "@aws-sdk/client-elastic-beanstalk": "^3.445.0",
     "@aws-sdk/client-route-53": "^3.445.0",
     "@aws-sdk/credential-provider-ini": "^3.441.0",
-    "commander": "^11.1.0",
     "inquirer": "^8.2.6",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/commander": "^2.12.2",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.8.10",
     "@types/uuid": "^9.0.6",

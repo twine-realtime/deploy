@@ -78,13 +78,17 @@ Resources:
   MyDynamoDBTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: MyDynamoDBTable
+      TableName: rooms
       AttributeDefinitions:
-        - AttributeName: Id
+        - AttributeName: id
           AttributeType: S
+        - AttributeName: time_created
+          AttributeType: N
       KeySchema:
-        - AttributeName: Id
+        - AttributeName: id
           KeyType: HASH
+        - AttributeName: time_created
+          KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
   SubnetRouteTableAssociationTwo:
@@ -177,7 +181,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 'dynamodb:*'
-                Resource: !GetAtt MyDynamoDBTable.Arn
+                Resource: '*'
         - PolicyName: SecretsManagerAccess
           PolicyDocument:
             Version: '2012-10-17'
