@@ -2,7 +2,7 @@
 
 Twine uses Cloud Formation to deploy on AWS. The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and creating an AWS CLI profile for either that account's root credentials or for an IAM role on that account with the AdministratorAccess permission policy. That profile name is to be provided when answering the deployment questions.
 
-A TLS certificate is required to secure your Twine server's WebSocket connection to your clients:
+A TLS certificate is required to secure your Twine server's WebSocket connection to clients:
 
 - In the AWS Console, navigate to the AWS Region where you plan to deploy Twine
 - Create a Route 53 domain in your new AWS account (you will later use that domain name with the Twine client library)
