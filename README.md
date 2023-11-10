@@ -12,7 +12,7 @@
 - Certificate Manager
 - ElastiCache for Redis
 - Application Load Balancer
-</details><br>
+</details>
 
 The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and ensuring that Node.js v18.x or greater is installed in your local environment. Complete the steps below to deploy Twine.
 
@@ -95,7 +95,7 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 8. Execute `npm start` to launch the deployment process
 9. Follow the instructions in your terminal
 <img width="633" alt="Screenshot 2023-11-10 at 9 13 33 PM" src="https://github.com/twine-realtime/deploy/assets/85587848/f1802593-9d7e-43a4-b07d-219e672261a2">
-</details><br>
+</details>
 
 The creation process can be observed in the 'Stacks' section of the AWS Cloud Formation page. After the process is complete, the Twine server will be running in the Elastic Beanstalk environment. However, to satisfy browser requirements, Twine must use your newly-created domain name instead of the load balancer endpoint.
 
@@ -113,6 +113,6 @@ The creation process can be observed in the 'Stacks' section of the AWS Cloud Fo
 7. Select the region name that you previously determined
 8. Select the single option for 'Choose Load Balancer'
 9. Click 'Create Records'
-</details><br>
+</details>
 
 Record creation will take a few minutes. The Twine architecture will then be complete and ready for the Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.
