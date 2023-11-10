@@ -198,4 +198,3 @@ const parseRegion = (certificateArn: string): string => {
     console.error('An error occurred:', error);
   }
 })();
-

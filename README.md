@@ -1,6 +1,9 @@
 # Twine Deployment
 
-### Twine AWS Requirements
+<details>
+<summary>Twine AWS Requirements</summary>
+<!--All you need is a blank line-->
+
 - IAM User
 - Route 53
 - DynamoDB
@@ -9,10 +12,15 @@
 - Certificate Manager
 - ElastiCache for Redis
 - Application Load Balancer
+</details><br>
 
 The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and ensuring that Node.js v18.x or greater is installed in your local environment. Complete the steps below to deploy Twine.
 
 ## Create an AWS Account and IAM User
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. [Sign up for a new AWS Account](https://portal.aws.amazon.com/billing/signup#/start/email)
 2. Sign in to your new AWS Account
 3. Click the second rightmost button in the top navbar
@@ -33,19 +41,35 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 17. Click 'Next' and then click 'Create Access Key'
 18. Prepare to provide your access key and secret access key
 
+</details>
+
 ## Create an AWS CLI profile
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 2. Execute `aws configure --profile new-profile-name` in terminal
 3. Provide your access key and secret access key
 4. Provide the region that you previously determined (must match)
+</details>
 
 ## Register a Route 53 Domain
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
 2. Click 'Dashboard' in the Route 53 page sidebar
 3. Check the top right of the webpage and ensure you are in the previously determined region
 4. Register a Route 53 domain (you will later use the domain name with the Twine client library)
+</details>
 
 ## Request a TLS Certificate
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. Search for 'Certificate Manager'
 2. Click 'Request Certificate' in the Certificate Manager sidebar
 3. 'Request a Public Certificate' should be selected; click 'Next'
@@ -54,8 +78,13 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 6. Select the 'RSA 2048' key algorithm
 7. Click 'Request'
 8. Validate the request
+</details>
 
 ## Deploy the Twine Architecture
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. Clone this repository
 2. Open your terminal
 3. Navigate to the repository directory 
@@ -66,10 +95,15 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 8. Execute `npm start` to launch the deployment process
 9. Follow the instructions in your terminal
 <img width="633" alt="Screenshot 2023-11-10 at 9 13 33 PM" src="https://github.com/twine-realtime/deploy/assets/85587848/f1802593-9d7e-43a4-b07d-219e672261a2">
+</details><br>
 
 The creation process can be observed in the 'Stacks' section of the AWS Cloud Formation page. After the process is complete, the Twine server will be running in the Elastic Beanstalk environment. However, to satisfy browser requirements, Twine must use your newly-created domain name instead of the load balancer endpoint.
 
 ## Create a DNS Record
+<details>
+<summary>Step-by-step guide</summary>
+<!--All you need is a blank line-->
+
 1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
 2. Click 'Hosted Zones' in the AWS Route 53 sidebar
 3. Click on the listed domain name
@@ -79,5 +113,6 @@ The creation process can be observed in the 'Stacks' section of the AWS Cloud Fo
 7. Select the region name that you previously determined
 8. Select the single option for 'Choose Load Balancer'
 9. Click 'Create Records'
+</details><br>
 
 Record creation will take a few minutes. The Twine architecture will then be complete and ready for the Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.
