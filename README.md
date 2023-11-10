@@ -1,23 +1,83 @@
 # Twine Deployment
 
-Twine uses Cloud Formation to deploy on AWS. The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and creating an AWS CLI profile for either that account's root credentials or for an IAM role on that account with the AdministratorAccess permission policy. That profile name is to be provided when answering the deployment questions.
+### Twine AWS Requirements
+- IAM User
+- Route 53
+- DynamoDB
+- Secrets Manager
+- Elastic Beanstalk
+- Certificate Manager
+- ElastiCache for Redis
+- Application Load Balancer
 
-## Obtain a TLS certificate
+The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account. Complete the steps below to deploy Twine.
 
-- In your new account's AWS Console, navigate to the AWS Region where you plan to deploy Twine
-- Create a Route 53 domain (you will later use that domain name with the Twine client library)
-- Navigate to Certificate Manager and request a TLS certificate with an RSA 2048 key for the new domain
+## Create an AWS Account and IAM User
+1. [Sign up for a new AWS Account](https://portal.aws.amazon.com/billing/signup#/start/email)
+2. Sign in to your new AWS Account
+3. Click the second rightmost button in the top navbar
+4. Select the region where you will deploy Twine
+4. Type 'IAM' in the search bar at the top of the page
+5. Click on the 'IAM' service
+6. Click 'Users' in the sidebar
+7. Click 'Create User'
+8. Choose a user name and click 'Next'
+9. Select 'Attach Policies Directly'
+10. Type 'AdministratorAccess' in the 'Permissions Policies' searchbar
+11. Select 'AdministratorAccess' and click 'Next'
+12. Click 'Create User'
+13. Click 'Users' in the sidebar and select the user you created
+14. Click the 'Security Credentials' tab
+15. Click 'Create Access Key'
+16. Select 'Command Line Interface (CLI)'
+17. Click 'Next' and then click 'Create Access Key'
+18. Prepare to provide your access key and secret access key
 
-Once those steps are complete, clone this repo > npm install > npm start and follow the instructions in your terminal.
+## Create an AWS CLI profile
+1. [Download the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+2. Execute `aws configure --profile new-profile-name` in terminal
+3. Provide your access key and secret access key
+4. Provide the region that you previously determined (must match)
 
-The creation process can be observed in Cloud Formation > Stacks. After the process is complete, the Twine server will be running in the Elastic Beanstalk Environment. However, to satisfy browser requirements, Twine must use the newly-created domain name instead of the load balancer endpoint. A DNS record for the load balancer is necessary:
+## Register a Route 53 Domain
+1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
+2. Click 'Hosted Zones' in the AWS Route 53 sidebar
+3. Click 'Dashboard' in the sidebar
+4. Check the top right of the page and ensure you are in previously determined region
+5. Register a Route 53 domain (you will later use this domain name with the Twine client library)
 
-- Navigate to Route 53 > Hosted Zones and click on the listed domain name
-- Click Create Record
-- Ensure the Record Type is A then click Alias
-- Set the Endpoint to 'Alias to Application and Classic Load Balancer'
-- Select the region name that you previously determined
-- Select the single option for Choose Load Balancer
-- Click Create Records
+## Request a TLS Certificate
+1. Search for 'Certificate Manager'
+2. Click 'Request Certificate' in the Certificate Manager sidebar
+3. 'Request a Public Certificate' should be selected; click 'Next'
+4. Enter your new domain name
+5. Select your validation method of choice
+6. Select the 'RSA 2048' key algorithm
+7. Click 'Request'
+8. Validate the request
 
-Record creation may take a few minutes. The Twine architecture will then be complete and ready for Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.
+## Deploy the Twine Architecture
+1. Clone this repository
+2. Open your terminal
+3. Navigate to the repository directory 
+4. Execute `aws configure list`
+5. If the 'Name' value is not your newly-created AWS CLI profile name, execute `export AWS_PROFILE=new-profile-name` (this command is different for Windows users)
+6. Execute `aws configure list` again to confirm the change occurred
+7. Execute `npm install` to install the Twine deployment dependencies
+8. Execute `npm start` to launch the deployment process
+9. Follow the instructions in your terminal
+
+The creation process can be observed in the 'Stacks' section of the AWS Cloud Formation page. After the process is complete, the Twine server will be running in the Elastic Beanstalk environment. However, to satisfy browser requirements, Twine must use your newly-created domain name instead of the load balancer endpoint.
+
+## Create a DNS Record
+1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
+2. Click 'Hosted Zones' in the AWS Route 53 sidebar
+3. Click on the listed domain name
+4. Click 'Create Record'
+5. Ensure the Record Type is 'A' then click 'Alias'
+6. Set the 'Endpoint' to 'Alias to Application and Classic Load Balancer'
+7. Select the region name that you previously determined
+8. Select the single option for 'Choose Load Balancer'
+9. Click 'Create Records'
+
+Record creation will take a few minutes. The Twine architecture will then be complete and ready for the Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.
