@@ -10,7 +10,7 @@
 - ElastiCache for Redis
 - Application Load Balancer
 
-The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and ensuring that Node.js v18.x is installed in your local environment. Complete the steps below to deploy Twine.
+The Twine architecture is extensive and requires broad permissions. For smooth deployment, we recommend creating a new AWS account and ensuring that Node.js v18.x or greater is installed in your local environment. Complete the steps below to deploy Twine.
 
 ## Create an AWS Account and IAM User
 1. [Sign up for a new AWS Account](https://portal.aws.amazon.com/billing/signup#/start/email)
