@@ -41,10 +41,9 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 
 ## Register a Route 53 Domain
 1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
-2. Click 'Hosted Zones' in the AWS Route 53 sidebar
-3. Click 'Dashboard' in the sidebar
-4. Check the top right of the page and ensure you are in previously determined region
-5. Register a Route 53 domain (you will later use this domain name with the Twine client library)
+2. Click 'Dashboard' in the Route 53 page sidebar
+3. Check the top right of the webpage and ensure you are in the previously determined region
+4. Register a Route 53 domain (you will later use the domain name with the Twine client library)
 
 ## Request a TLS Certificate
 1. Search for 'Certificate Manager'
