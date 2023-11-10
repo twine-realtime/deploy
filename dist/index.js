@@ -215,7 +215,7 @@ var promptReadyToDeploy = function () { return __awaiter(void 0, void 0, void 0,
                 return [4 /*yield*/, inquirer.prompt(question)];
             case 1:
                 answer = _a.sent();
-                return [2 /*return*/, answer.readyToProceed];
+                return [2 /*return*/, answer.readyToDeploy];
         }
     });
 }); };

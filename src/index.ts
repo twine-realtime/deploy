@@ -143,7 +143,7 @@ const promptReadyToDeploy = async () => {
   };
 
   const answer = await inquirer.prompt(question);
-  return answer.readyToProceed;
+  return answer.readyToDeploy;
 };
 
 (async () => {

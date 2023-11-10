@@ -133,6 +133,10 @@ Resources:
           FromPort: '3005'
           ToPort: '3005'
           SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
 
   SampleRedisSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -143,6 +147,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: '6379'
           ToPort: '6379'
+          SourceSecurityGroupId: !Ref SampleEnvironmentSecurityGroup
+        - IpProtocol: tcp
+          FromPort: '16379'
+          ToPort: '16379'
           SourceSecurityGroupId: !Ref SampleEnvironmentSecurityGroup
 
   SampleInstanceProfile:
@@ -249,10 +257,11 @@ Resources:
           Value: 't2.small'
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: CACHE_ENDPOINT
-          Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: REDIS_PORT
-          Value: '6379'
+          Value: !Join 
+            - ''
+            - - 'redis://'
+              - !GetAtt MyRedisCluster.RedisEndpoint.Address
+              - ':6379'
         - Namespace: 'aws:elbv2:listener:443'
           OptionName: 'ListenerEnabled'
           Value: 'true'
@@ -287,24 +296,20 @@ Resources:
         - !Ref MyPublicSubnetTwo
 
   MyRedisCluster:
-    Type: 'AWS::ElastiCache::ReplicationGroup'
+    Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
-      ReplicationGroupDescription: 'My cluster mode enabled Redis replication group'
       Engine: 'redis'
       CacheNodeType: 'cache.t4g.micro'
-      NumNodeGroups: 1
-      ReplicasPerNodeGroup: 1
-      AutomaticFailoverEnabled: true
-      MultiAZEnabled: true
+      NumCacheNodes: 1
       CacheSubnetGroupName: !Ref MyElastiCacheSubnetGroup
-      SecurityGroupIds:
-        - !GetAtt SampleEnvironmentSecurityGroup.GroupId
+      VpcSecurityGroupIds:
+        - !GetAtt SampleRedisSecurityGroup.GroupId
 
 Outputs:
   EnvironmentURL:
     Description: 'URL of the AWS Elastic Beanstalk Environment'
     Value: !GetAtt SampleEnvironment.EndpointURL
 
-  RedisEndpoint:
-    Description: 'The endpoint of the ElastiCache Redis cluster'
-    Value: !GetAtt MyRedisCluster.PrimaryEndPoint.Address
+  RedisEndPoint:
+    Description: 'Endpoint of the ElastiCache Redis cluster'
+    Value: !GetAtt MyRedisCluster.RedisEndpoint.Address
