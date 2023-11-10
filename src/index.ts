@@ -40,36 +40,7 @@ const promptProfile = async () => {
   return profile;
 };
 
-const promptRegion = async () => {
-  let region = '';
-  const question = {
-    type: 'input',
-    name: 'region',
-    prefix: 'Twine ~',
-    message: 'AWS region for deployment:',
-    // The region validation is now handled in the prompt itself
-    validate: async (input: string) => {
-      if (input.length === 0) {
-        return "Region cannot be empty.";
-      }
-
-      // Instantiate an EC2 client to verify the region
-      const ec2Client = new EC2Client({ region: "us-east-1" }); // Default to a common region to fetch list of regions
-      const regionsResult = await ec2Client.send(new DescribeRegionsCommand({}));
-      const validRegions = regionsResult.Regions?.map(r => r.RegionName) ?? [];
-      return validRegions.includes(input) ? true : `The specified region "${input}" is not a valid AWS region.`;
-    }
-  };
-
-  // Keep prompting until valid input is received
-  while (region === '') {
-    const answer = await inquirer.prompt(question);
-    region = answer.region;
-  }
-  return region;
-};
-
-const validateCertificateArn = (input: string, region: string) => {
+const validateCertificateArn = (input: string) => {
   // Check structure of input certificate ARN
   const arnRegex = /^arn:aws:acm:[a-z0-9-]+:\d{12}:certificate\/[a-zA-Z0-9-]+$/;
 
@@ -81,21 +52,17 @@ const validateCertificateArn = (input: string, region: string) => {
     return "The ARN format is invalid.";
   }
 
-  if (!input.includes(`:acm:${region}:`)) {
-    return `The certificate ARN must be from the same region as the deployment region: ${region}`;
-  }
-
   return true;
 };
 
-const promptCertificateArn = async (region: string) => {
+const promptCertificateArn = async () => {
   let certificateArn = '';
   const question = {
     type: 'input',
     name: 'certificateArn',
     prefix: 'Twine ~',
     message: 'ARN of the ACM TLS certificate:',
-    validate: (input: string) => validateCertificateArn(input, region)
+    validate: (input: string) => validateCertificateArn(input)
   };
 
   // Keep prompting until valid input is received
@@ -118,8 +85,7 @@ const promptReadyToProceed = async () => {
 \x1b[0mYou will be asked to provide:
 
 \x1b[0m1) An AWS CLI profile name for credentials
-\x1b[0m2) The AWS region for deployment
-\x1b[0m3) The ARN of an ACM TLS certificate hosted within the deployment region
+\x1b[0m2) The ARN of an ACM TLS certificate hosted within the deployment region
 
 \x1b[0mIf you have not already done so, read the documentation 
 \x1b[0mand complete the prerequisite steps in this README:
@@ -146,6 +112,12 @@ const promptReadyToDeploy = async () => {
   return answer.readyToDeploy;
 };
 
+const parseRegion = (certificateArn: string): string => {
+  const arnParts = certificateArn.split(':');
+  const region = arnParts[3];
+  return region;
+};
+
 (async () => {
   const isReady = await promptReadyToProceed();
 
@@ -155,10 +127,9 @@ const promptReadyToDeploy = async () => {
   }
 
   try {
-    // Validate one at a time
     const profile = await promptProfile();
-    const region = await promptRegion();
-    const certificateArn = await promptCertificateArn(region);
+    const certificateArn = await promptCertificateArn();
+    const region = parseRegion(certificateArn);
     const confirmDeployment = await promptReadyToDeploy();
 
     if (!confirmDeployment) {
