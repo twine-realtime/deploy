@@ -1,7 +1,10 @@
 import { v4 as uuid4 } from 'uuid';
 import { readFileSync } from 'fs';
 import { fromIni } from "@aws-sdk/credential-provider-ini";
-import { CloudFormationClient, CreateStackCommand, Capability } from '@aws-sdk/client-cloudformation';
+import {
+  CloudFormationClient,
+  CreateStackCommand,
+  Capability } from '@aws-sdk/client-cloudformation';
 import {
   promptReadyToProceed,
   promptProfile,
