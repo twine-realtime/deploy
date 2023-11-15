@@ -228,6 +228,9 @@ Resources:
       SolutionStackName: !Ref SolutionStackName
       VersionLabel: !Ref MyAppVersion
       OptionSettings:
+        - Namespace: 'aws:elasticbeanstalk:environment:proxy'
+          OptionName: ProxyServer
+          Value: 'none'
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: LoadBalanced
@@ -236,10 +239,31 @@ Resources:
           Value: 'application'
         - Namespace: 'aws:elasticbeanstalk:application'
           OptionName: Application Healthcheck URL
-          Value: 'HTTP:3005/'
+          Value: '/'
+        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
+          OptionName: HealthCheckPath
+          Value: '/'
+        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
+          OptionName: MatcherHTTPCode
+          Value: '201'
         - Namespace: 'aws:ec2:vpc'
           OptionName: VPCId
           Value: !Ref MyVPC
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: MeasureName
+          Value: CPUUtilization
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: Statistic
+          Value: Maximum
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: Unit
+          Value: Percent
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: UpperThreshold
+          Value: 40
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: LowerThreshold
+          Value: 10
         - Namespace: 'aws:ec2:vpc'
           OptionName: Subnets
           Value: !Join [',', [!Ref MyPublicSubnetOne, !Ref MyPublicSubnetTwo]]
@@ -254,7 +278,7 @@ Resources:
           Value: !Ref SampleInstanceProfile
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: InstanceType
-          Value: 't2.small'
+          Value: 't2.xlarge'
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: CACHE_ENDPOINT
           Value: !Join 
@@ -274,15 +298,6 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'REGION'
           Value: !Ref EnvironmentRegion
-        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
-          OptionName: StickinessEnabled
-          Value: 'true'
-        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
-          OptionName: StickinessType
-          Value: 'lb_cookie'
-        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
-          OptionName: StickinessLBCookieDuration
-          Value: '86400'
       Tier:
         Name: WebServer
         Type: Standard
