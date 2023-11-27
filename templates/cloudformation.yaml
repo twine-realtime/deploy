@@ -264,6 +264,12 @@ Resources:
         - Namespace: 'aws:autoscaling:trigger'
           OptionName: LowerThreshold
           Value: 10
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: Period
+          Value: 1
+        - Namespace: 'aws:autoscaling:trigger'
+          OptionName: BreachDuration
+          Value: 1
         - Namespace: 'aws:ec2:vpc'
           OptionName: Subnets
           Value: !Join [',', [!Ref MyPublicSubnetOne, !Ref MyPublicSubnetTwo]]
@@ -278,7 +284,13 @@ Resources:
           Value: !Ref SampleInstanceProfile
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: InstanceType
-          Value: 't2.xlarge'
+          Value: 't3.small'
+        - Namespace: 'aws:autoscaling:asg'
+          OptionName: MinSize
+          Value: 1
+        - Namespace: 'aws:autoscaling:asg'
+          OptionName: MaxSize
+          Value: 4
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: CACHE_ENDPOINT
           Value: !Join 
@@ -298,6 +310,15 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'REGION'
           Value: !Ref EnvironmentRegion
+        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
+          OptionName: StickinessEnabled
+          Value: 'true'
+        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
+          OptionName: StickinessType
+          Value: 'lb_cookie'
+        - Namespace: 'aws:elasticbeanstalk:environment:process:default'
+          OptionName: StickinessLBCookieDuration
+          Value: '86400'
       Tier:
         Name: WebServer
         Type: Standard
