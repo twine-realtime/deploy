@@ -287,7 +287,7 @@ Resources:
           Value: 't3.small'
         - Namespace: 'aws:autoscaling:asg'
           OptionName: MinSize
-          Value: 1
+          Value: 2
         - Namespace: 'aws:autoscaling:asg'
           OptionName: MaxSize
           Value: 4
@@ -335,7 +335,7 @@ Resources:
     Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
       Engine: 'redis'
-      CacheNodeType: 'cache.t4g.micro'
+      CacheNodeType: 'cache.t4g.small'
       NumCacheNodes: 1
       CacheSubnetGroupName: !Ref MyElastiCacheSubnetGroup
       VpcSecurityGroupIds:

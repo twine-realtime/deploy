@@ -115,4 +115,4 @@ The creation process can be observed in the 'Stacks' section of the AWS Cloud Fo
 9. Click 'Create Records'
 </details>
 
-Record creation will take a few minutes. The Twine architecture will then be complete and ready for the Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery.
+Record creation will take a few minutes. The Twine architecture will then be complete and ready for the Twine server/client library implementation. Please note that Twine issues third-party cookies for sticky sessions and to store WebSocket session data for connection state recovery. Your Twine API key (required to publish to the Twine API) is available on your newly-created AWS Secrets Manager page.
