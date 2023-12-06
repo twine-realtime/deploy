@@ -69,6 +69,32 @@ export const promptCertificateArn = async () => {
   return certificateArn;
 };
 
+export const promptInstanceType = async () => {
+  const question = {
+    type: 'input',
+    name: 'instanceType',
+    prefix: 'Twine ~',
+    message: 'Your chosen EC2 instance type:',
+  };
+
+  const answer = await inquirer.prompt(question);
+
+  return answer.instanceType;
+};
+
+export const promptCacheType = async () => {
+  const question = {
+    type: 'input',
+    name: 'cacheType',
+    prefix: 'Twine ~',
+    message: 'Your chosen ElastiCache for Redis type:',
+  };
+
+  const answer = await inquirer.prompt(question);
+  console.log(answer.cacheType);
+  return answer.cacheType;
+};
+
 export const promptReadyToProceed = async () => {
   const question = {
     type: 'confirm',
@@ -82,6 +108,8 @@ export const promptReadyToProceed = async () => {
 
 \x1b[0m1) An AWS CLI profile name for credentials
 \x1b[0m2) The ARN of an ACM TLS certificate hosted within the deployment region
+\x1b[0m3) The EC2 instance type you wish to use
+\x1b[0m4) The ElastiCache Redis type you wish to use
 
 \x1b[0mIf you have not already done so, read the documentation 
 \x1b[0mand complete the prerequisite steps in this README:

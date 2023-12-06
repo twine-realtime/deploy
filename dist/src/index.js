@@ -42,7 +42,7 @@ var credential_provider_ini_1 = require("@aws-sdk/credential-provider-ini");
 var client_cloudformation_1 = require("@aws-sdk/client-cloudformation");
 var helpers_js_1 = require("../utils/helpers.js");
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var isReady, profile, certificateArn, region, confirmDeployment, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_1;
+    var isReady, profile, certificateArn, region, instanceType, cacheType, confirmDeployment, cloudFormationClient, templateContent, templateBody, cfParams, createStackCommand, stackResult, cfError_1, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, (0, helpers_js_1.promptReadyToProceed)()];
@@ -54,7 +54,7 @@ var helpers_js_1 = require("../utils/helpers.js");
                 }
                 _a.label = 2;
             case 2:
-                _a.trys.push([2, 10, , 11]);
+                _a.trys.push([2, 12, , 13]);
                 return [4 /*yield*/, (0, helpers_js_1.promptProfile)()];
             case 3:
                 profile = _a.sent();
@@ -62,8 +62,14 @@ var helpers_js_1 = require("../utils/helpers.js");
             case 4:
                 certificateArn = _a.sent();
                 region = (0, helpers_js_1.parseRegion)(certificateArn);
-                return [4 /*yield*/, (0, helpers_js_1.promptReadyToDeploy)()];
+                return [4 /*yield*/, (0, helpers_js_1.promptInstanceType)()];
             case 5:
+                instanceType = _a.sent();
+                return [4 /*yield*/, (0, helpers_js_1.promptCacheType)()];
+            case 6:
+                cacheType = _a.sent();
+                return [4 /*yield*/, (0, helpers_js_1.promptReadyToDeploy)()];
+            case 7:
                 confirmDeployment = _a.sent();
                 if (!confirmDeployment) {
                     console.log('\nTwine deployment cancelled.');
@@ -104,6 +110,14 @@ var helpers_js_1 = require("../utils/helpers.js");
                             ParameterKey: 'S3BucketParam',
                             ParameterValue: "twine-".concat(region),
                         },
+                        {
+                            ParameterKey: 'InstanceType',
+                            ParameterValue: instanceType,
+                        },
+                        {
+                            ParameterKey: 'CacheType',
+                            ParameterValue: cacheType,
+                        },
                     ],
                     TemplateBody: templateContent,
                     Capabilities: [
@@ -112,26 +126,26 @@ var helpers_js_1 = require("../utils/helpers.js");
                     ],
                     StackName: 'TwineStack'
                 };
-                _a.label = 6;
-            case 6:
-                _a.trys.push([6, 8, , 9]);
+                _a.label = 8;
+            case 8:
+                _a.trys.push([8, 10, , 11]);
                 console.log("Deploying Twine stack to region ".concat(region, "..."));
                 createStackCommand = new client_cloudformation_1.CreateStackCommand(cfParams);
                 return [4 /*yield*/, cloudFormationClient.send(createStackCommand)];
-            case 7:
+            case 9:
                 stackResult = _a.sent();
                 console.log("Stack creation initiated, StackId: ".concat(stackResult.StackId));
-                return [3 /*break*/, 9];
-            case 8:
+                return [3 /*break*/, 11];
+            case 10:
                 cfError_1 = _a.sent();
                 console.error('Error creating AWS CloudFormation stack:', cfError_1);
-                return [3 /*break*/, 9];
-            case 9: return [3 /*break*/, 11];
-            case 10:
+                return [3 /*break*/, 11];
+            case 11: return [3 /*break*/, 13];
+            case 12:
                 error_1 = _a.sent();
                 console.error('An error occurred:', error_1);
-                return [3 /*break*/, 11];
-            case 11: return [2 /*return*/];
+                return [3 /*break*/, 13];
+            case 13: return [2 /*return*/];
         }
     });
 }); })();

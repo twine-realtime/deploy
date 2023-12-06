@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseRegion = exports.promptReadyToDeploy = exports.promptReadyToProceed = exports.promptCertificateArn = exports.validateCertificateArn = exports.promptProfile = void 0;
+exports.parseRegion = exports.promptReadyToDeploy = exports.promptReadyToProceed = exports.promptCacheType = exports.promptInstanceType = exports.promptCertificateArn = exports.validateCertificateArn = exports.promptProfile = void 0;
 var credential_provider_ini_1 = require("@aws-sdk/credential-provider-ini");
 var inquirer = require('inquirer');
 var promptProfile = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -135,6 +135,45 @@ var promptCertificateArn = function () { return __awaiter(void 0, void 0, void 0
     });
 }); };
 exports.promptCertificateArn = promptCertificateArn;
+var promptInstanceType = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var question, answer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                question = {
+                    type: 'input',
+                    name: 'instanceType',
+                    prefix: 'Twine ~',
+                    message: 'Your chosen EC2 instance type:',
+                };
+                return [4 /*yield*/, inquirer.prompt(question)];
+            case 1:
+                answer = _a.sent();
+                return [2 /*return*/, answer.instanceType];
+        }
+    });
+}); };
+exports.promptInstanceType = promptInstanceType;
+var promptCacheType = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var question, answer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                question = {
+                    type: 'input',
+                    name: 'cacheType',
+                    prefix: 'Twine ~',
+                    message: 'Your chosen ElastiCache for Redis type:',
+                };
+                return [4 /*yield*/, inquirer.prompt(question)];
+            case 1:
+                answer = _a.sent();
+                console.log(answer.cacheType);
+                return [2 /*return*/, answer.cacheType];
+        }
+    });
+}); };
+exports.promptCacheType = promptCacheType;
 var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0, function () {
     var question, answer;
     return __generator(this, function (_a) {
@@ -144,7 +183,7 @@ var promptReadyToProceed = function () { return __awaiter(void 0, void 0, void 0
                     type: 'confirm',
                     name: 'readyToProceed',
                     prefix: '',
-                    message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The ARN of an ACM TLS certificate hosted within the deployment region\n\n\u001B[0mIf you have not already done so, read the documentation \n\u001B[0mand complete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
+                    message: "\u001B[0m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n\u001B[0mThis process deploys the Twine architecture on your AWS account.\n\n\u001B[0mYou will be asked to provide:\n\n\u001B[0m1) An AWS CLI profile name for credentials\n\u001B[0m2) The ARN of an ACM TLS certificate hosted within the deployment region\n\u001B[0m3) The EC2 instance type you wish to use\n\u001B[0m4) The ElastiCache Redis type you wish to use\n\n\u001B[0mIf you have not already done so, read the documentation \n\u001B[0mand complete the prerequisite steps in this README:\n\u001B[0mhttps://github.com/twine-realtime/deploy/blob/main/README.md\n\n\u001B[0mAre you ready to proceed?",
                     default: false // Default answer
                 };
                 return [4 /*yield*/, inquirer.prompt(question)];

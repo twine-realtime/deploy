@@ -9,6 +9,8 @@ import {
   promptReadyToProceed,
   promptProfile,
   parseRegion,
+  promptInstanceType,
+  promptCacheType,
   promptCertificateArn,
   promptReadyToDeploy } from '../utils/helpers.js';
 
@@ -24,6 +26,8 @@ import {
     const profile = await promptProfile();
     const certificateArn = await promptCertificateArn();
     const region = parseRegion(certificateArn);
+    const instanceType = await promptInstanceType();
+    const cacheType = await promptCacheType();
     const confirmDeployment = await promptReadyToDeploy();
 
     if (!confirmDeployment) {
@@ -68,6 +72,14 @@ import {
         {
           ParameterKey: 'S3BucketParam',
           ParameterValue: `twine-${region}`,
+        },
+        {
+          ParameterKey: 'InstanceType',
+          ParameterValue: instanceType,
+        },
+        {
+          ParameterKey: 'CacheType',
+          ParameterValue: cacheType,
         },
       ],
       TemplateBody: templateContent,

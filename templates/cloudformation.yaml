@@ -16,6 +16,12 @@ Parameters:
   EnvironmentRegion:
     Type: String
     Description: The AWS Region where the application will be deployed
+  InstanceType:
+    Type: String
+    Description: The EC2 instance type for the Beanstalk environment
+  CacheType:
+    Type: String
+    Description: The ElastiCache type
   S3BucketParam:
     Type: String
     Description: The name of the S3 bucket where the source bundle is located
@@ -284,7 +290,7 @@ Resources:
           Value: !Ref SampleInstanceProfile
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: InstanceType
-          Value: 't3.small'
+          Value: !Ref InstanceType
         - Namespace: 'aws:autoscaling:asg'
           OptionName: MinSize
           Value: 2
@@ -335,7 +341,7 @@ Resources:
     Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
       Engine: 'redis'
-      CacheNodeType: 'cache.t4g.small'
+      CacheNodeType: !Ref CacheType
       NumCacheNodes: 1
       CacheSubnetGroupName: !Ref MyElastiCacheSubnetGroup
       VpcSecurityGroupIds:
