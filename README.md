@@ -94,7 +94,7 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 7. Execute `npm install` to install the Twine deployment dependencies
 8. Execute `npm start` to launch the deployment process
 9. Follow the instructions in your terminal
-<img width="633" alt="Screenshot 2023-11-10 at 9 13 33 PM" src="https://github.com/twine-realtime/deploy/assets/85587848/f1802593-9d7e-43a4-b07d-219e672261a2">
+<img width="630" alt="Screenshot 2023-12-07 at 11 54 58 AM" src="https://github.com/twine-realtime/deploy/assets/85587848/452f9608-e6c1-445a-a946-12b70d98477c">
 </details>
 
 The creation process can be observed in the 'Stacks' section of the AWS Cloud Formation page. After the process is complete, the Twine server will be running in the Elastic Beanstalk environment. However, to satisfy browser requirements, Twine must use your newly-created domain name instead of the load balancer endpoint.
