@@ -61,8 +61,7 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 
 1. Enter the [AWS Console](http://console.aws.amazon.com) and search for 'Route 53'
 2. Click 'Dashboard' in the Route 53 page sidebar
-3. Check the top right of the webpage and ensure you are in the previously determined region
-4. Register a Route 53 domain (you will later use the domain name with the Twine client library)
+3. Register a Route 53 domain (you will later use the domain name with the Twine client library)
 </details>
 
 ## Request a TLS Certificate
