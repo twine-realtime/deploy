@@ -12,7 +12,8 @@ Parameters:
   SolutionStackName:
     Type: String
     Description: The name of an Elastic Beanstalk supported platform version
-    Default: '64bit Amazon Linux 2023 v4.1.0 running Docker'
+    # Default: '64bit Amazon Linux 2023 v4.1.0 running Docker'
+    Default: '64bit Amazon Linux 2023 v4.2.1 running Docker'
   EnvironmentRegion:
     Type: String
     Description: The AWS Region where the application will be deployed
