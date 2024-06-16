@@ -24,7 +24,7 @@ The Twine architecture is extensive and requires broad permissions. For smooth d
 1. [Sign up for a new AWS Account](https://portal.aws.amazon.com/billing/signup#/start/email)
 2. Sign in to your new AWS Account
 3. Click the second rightmost button in the top navbar
-4. Select the region where you will deploy Twine
+4. Select the region where you will deploy Twine (Twine currently supports us-east-1 and ap-southeast-2)
 4. Type 'IAM' in the search bar at the top of the page
 5. Click on the 'IAM' service
 6. Click 'Users' in the sidebar
